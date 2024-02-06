@@ -4,6 +4,7 @@ import pygame.font
 
 from pygame.sprite import Group
 from ship import Ship
+from time import sleep
 
 class Scoreboard:
     """A class to report scoring information.
