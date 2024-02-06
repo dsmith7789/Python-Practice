@@ -1,7 +1,9 @@
 from __future__ import annotations
 import pygame
 
-class Ship:
+from pygame.sprite import Sprite
+
+class Ship(Sprite):
     """A class to manage the ship.
     """
 
@@ -11,6 +13,7 @@ class Ship:
         Args:
             ai_game (AlienInvasion): The current alien invasion game.
         """
+        super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
         self.screen_rect = ai_game.screen.get_rect()
