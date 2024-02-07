@@ -38,7 +38,7 @@ class AlienInvasion:
                                   text_color=(255, 255, 255),   # white
                                   font=pygame.font.SysFont(None, 48)
                                   )
-        self.pause_button = Button(ai_game=self, msg="Pause", width=200, height=50, 
+        self.resume_button = Button(ai_game=self, msg="Resume", width=200, height=50, 
                                   button_color=(255, 0, 0),      # bright red
                                   text_color=(255, 255, 255),   # white
                                   font=pygame.font.SysFont(None, 48)
@@ -53,7 +53,7 @@ class AlienInvasion:
         while True:
             self._check_events()
 
-            if self.stats.game_active:
+            if self.stats.game_active and not self.stats.game_paused:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
@@ -74,12 +74,13 @@ class AlienInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+                self._check_resume_button(mouse_pos)
     
     def _check_play_button(self, mouse_pos: tuple[int, int]) -> None:
-        """PRIVATE: Start a new game when the player clicks the play button.
+        """PRIVATE: Start a new game when the player clicks the "Play" button.
 
         Args:
-            mouse_pos (tuple[int, int]): The position of the mouse. Must be over the Play button to start the game.
+            mouse_pos (tuple[int, int]): The position of the mouse. Must be over the "Play" button to start the game.
         """
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
@@ -103,6 +104,23 @@ class AlienInvasion:
 
             # Hide the mouse cursor.
             pygame.mouse.set_visible(False)
+
+    def _check_resume_button(self, mouse_pos: tuple[int, int]) -> None:
+        """PRIVATE: Continue the game when the player clicks the "Resume" button.
+
+        Args:
+            mouse_pos (tuple[int, int]): The position of the mouse. Must be over the "Resume" button to resume the game.
+        """
+        button_clicked = self.resume_button.rect.collidepoint(mouse_pos)
+        if button_clicked and self.stats.game_paused:
+            # Reset game statistics.
+            self.stats.game_paused = False
+
+            # Hide the mouse cursor.
+            pygame.mouse.set_visible(False)
+
+            # Give the player a second to get set.
+            sleep(1.0)
     
     def _update_screen(self) -> None:
         """PRIVATE: Update images on the screen, and flip to the new screen.
@@ -122,6 +140,10 @@ class AlienInvasion:
         # Draw the play button if the game is inactive.
         if not self.stats.game_active:
             self.play_button.draw_button()
+
+        # Draw the resume button if the game is paused.
+        if self.stats.game_paused:
+            self.resume_button.draw_button()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
@@ -274,8 +296,10 @@ class AlienInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
-        elif event.key == pygame.K_q:
+        elif event.key in [pygame.K_ESCAPE, pygame.K_q]:
             sys.exit()
+        elif event.key == pygame.K_p:
+            self._pause_game()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
     
@@ -289,6 +313,11 @@ class AlienInvasion:
             self.ship.moving_left = False
         elif event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
+
+    def _pause_game(self) -> None:
+        """PRIVATE: Handles pause game logic.
+        """
+        self.stats.game_paused = True
 
 if __name__ == '__main__':
     # Make a game instance, and run the game.
