@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 
 import pygame.font
 
@@ -6,17 +7,32 @@ class Button:
     """A class to manage buttons (Pygame doesn't have a built-in button method).
     """
     
-    def __init__(self, ai_game: "AlienInvasion", msg: str) -> None:
-        """Initialize button attributes.
+    def __init__(self, ai_game: "AlienInvasion", 
+                 msg: str, 
+                 width: int,
+                 height: int,
+                 button_color: tuple[int, int, int], 
+                 text_color: tuple[int, int, int],
+                 font: pygame.font.SysFont
+                 ) -> None:
+        """Initialize button attributes
+
+        Args:
+            ai_game (AlienInvasion): the current Alien Invasion game.
+            msg (str): The text we want to display on the button.
+            width (int): How wide the button should be.
+            height (int): How tall the button should be.
+            button_color (Optional[tuple[int, int, int]], optional): Background color of the button. Defaults to (0, 255, 0).
+            text_color (Optional[tuple[int, int, int]], optional): Text color of the button. Defaults to (255, 255, 255).
         """
         self.screen = ai_game.screen
         self.screen_rect = self.screen.get_rect()
 
         # Set the dimensions and properties of the button.
-        self.width, self.height = 200, 50
-        self.button_color = (0, 255, 0)     # bright green
-        self.text_color = (255, 255, 255)   # white
-        self.font = pygame.font.SysFont(None, 48)
+        self.width, self.height = width, height
+        self.button_color = button_color     # bright green
+        self.text_color = text_color   # white
+        self.font = font
 
         # Build the button's rect object and center it.
         self.rect = pygame.Rect(0, 0, self.width, self.height)

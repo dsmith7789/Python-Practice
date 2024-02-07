@@ -32,8 +32,17 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        # Make the "Play" button
-        self.play_button = Button(self, "Play")
+        # Make the "Play" and "Pause" buttons
+        self.play_button = Button(ai_game=self, msg="Play", width=200, height=50, 
+                                  button_color=(0, 255, 0),      # bright green
+                                  text_color=(255, 255, 255),   # white
+                                  font=pygame.font.SysFont(None, 48)
+                                  )
+        self.pause_button = Button(ai_game=self, msg="Pause", width=200, height=50, 
+                                  button_color=(255, 0, 0),      # bright red
+                                  text_color=(255, 255, 255),   # white
+                                  font=pygame.font.SysFont(None, 48)
+                                  )
 
         # Set the background color (light grey).
         self.bg_color = (230, 230, 230)
