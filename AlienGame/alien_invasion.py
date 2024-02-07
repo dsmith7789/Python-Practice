@@ -84,26 +84,32 @@ class AlienInvasion:
         """
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
-            # Reset game settings.
-            self.settings.initialize_dynamic_settings()
+            self._start_game()
+    
+    def _start_game(self) -> None:
+        """Contains the logic to actually start the game.
+        Callable fron both clicking the button and pressing the Enter key.
+        """
+        # Reset game settings.
+        self.settings.initialize_dynamic_settings()
 
-            # Reset game statistics.
-            self.stats.reset_stats()
-            self.stats.game_active = True
-            self.sb.prep_score()
-            self.sb.prep_level()
-            self.sb.prep_ships()
+        # Reset game statistics.
+        self.stats.reset_stats()
+        self.stats.game_active = True
+        self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
 
-            # Get rid of any remaining aliens and bullets.
-            self.aliens.empty()
-            self.bullets.empty()
+        # Get rid of any remaining aliens and bullets.
+        self.aliens.empty()
+        self.bullets.empty()
 
-            # Create a new fleet and center the ship.
-            self._create_fleet()
-            self.ship.center_ship()
+        # Create a new fleet and center the ship.
+        self._create_fleet()
+        self.ship.center_ship()
 
-            # Hide the mouse cursor.
-            pygame.mouse.set_visible(False)
+        # Hide the mouse cursor.
+        pygame.mouse.set_visible(False)
 
     def _check_resume_button(self, mouse_pos: tuple[int, int]) -> None:
         """PRIVATE: Continue the game when the player clicks the "Resume" button.
@@ -121,6 +127,19 @@ class AlienInvasion:
 
             # Give the player a second to get set.
             sleep(1.0)
+    
+    def _resume_game(self) -> None:
+        """Contains logic to actually resume the game.
+        Callable fron both clicking the button and pressing the Enter key.
+        """
+        # Reset game statistics.
+        self.stats.game_paused = False
+
+        # Hide the mouse cursor.
+        pygame.mouse.set_visible(False)
+
+        # Give the player a second to get set.
+        sleep(1.0)
     
     def _update_screen(self) -> None:
         """PRIVATE: Update images on the screen, and flip to the new screen.
@@ -300,6 +319,11 @@ class AlienInvasion:
             sys.exit()
         elif event.key == pygame.K_p:
             self._pause_game()
+        elif event.key == pygame.K_KP_ENTER:
+            if not self.stats.game_active:
+                self._start_game()
+            elif self.stats.game_paused:
+                self._resume_game()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
     
