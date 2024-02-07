@@ -319,7 +319,7 @@ class AlienInvasion:
             sys.exit()
         elif event.key == pygame.K_p:
             self._pause_game()
-        elif event.key == pygame.K_KP_ENTER:
+        elif event.key in [pygame.K_KP_ENTER, pygame.K_RETURN]:
             if not self.stats.game_active:
                 self._start_game()
             elif self.stats.game_paused:
