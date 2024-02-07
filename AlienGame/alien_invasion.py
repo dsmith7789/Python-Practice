@@ -32,7 +32,7 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        # Make the "Play" and "Pause" buttons
+        # Make the "Play" and "Pause", and "Level Cleared!" buttons
         self.play_button = Button(ai_game=self, msg="Play", width=200, height=50, 
                                   button_color=(0, 255, 0),      # bright green
                                   text_color=(255, 255, 255),   # white
@@ -40,6 +40,11 @@ class AlienInvasion:
                                   )
         self.resume_button = Button(ai_game=self, msg="Resume", width=200, height=50, 
                                   button_color=(255, 0, 0),      # bright red
+                                  text_color=(255, 255, 255),   # white
+                                  font=pygame.font.SysFont(None, 48)
+                                  )
+        self.level_cleared_button = Button(ai_game=self, msg="Level Cleared!", width=300, height=50, 
+                                  button_color=(0, 0, 255),      # bright blue
                                   text_color=(255, 255, 255),   # white
                                   font=pygame.font.SysFont(None, 48)
                                   )
@@ -53,7 +58,7 @@ class AlienInvasion:
         while True:
             self._check_events()
 
-            if self.stats.game_active and not self.stats.game_paused:
+            if self.stats.game_active and not self.stats.game_paused and not self.stats.level_break:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
@@ -119,14 +124,7 @@ class AlienInvasion:
         """
         button_clicked = self.resume_button.rect.collidepoint(mouse_pos)
         if button_clicked and self.stats.game_paused:
-            # Reset game statistics.
-            self.stats.game_paused = False
-
-            # Hide the mouse cursor.
-            pygame.mouse.set_visible(False)
-
-            # Give the player a second to get set.
-            sleep(1.0)
+            self._resume_game()
     
     def _resume_game(self) -> None:
         """Contains logic to actually resume the game.
@@ -134,12 +132,18 @@ class AlienInvasion:
         """
         # Reset game statistics.
         self.stats.game_paused = False
+        self.stats.level_break = False
 
         # Hide the mouse cursor.
         pygame.mouse.set_visible(False)
 
         # Give the player a second to get set.
         sleep(1.0)
+
+    def _check_level_cleared_button(self, mouse_pos: tuple[int, int]) -> None:
+        button_clicked = self.level_cleared_button.rect.collidepoint(mouse_pos)
+        if button_clicked and self.stats.game_paused:
+            self._resume_game()
     
     def _update_screen(self) -> None:
         """PRIVATE: Update images on the screen, and flip to the new screen.
@@ -163,6 +167,10 @@ class AlienInvasion:
         # Draw the resume button if the game is paused.
         if self.stats.game_paused:
             self.resume_button.draw_button()
+
+        # Draw the level cleared button once the player cleared a level.
+        if self.stats.level_break:
+            self.level_cleared_button.draw_button()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
@@ -208,6 +216,7 @@ class AlienInvasion:
 
             # Increase level.
             self.stats.level += 1
+            self.stats.level_break = True
             self.sb.prep_level()
 
     def _create_fleet(self) -> None:
@@ -322,7 +331,7 @@ class AlienInvasion:
         elif event.key in [pygame.K_KP_ENTER, pygame.K_RETURN]:
             if not self.stats.game_active:
                 self._start_game()
-            elif self.stats.game_paused:
+            elif self.stats.game_paused or self.stats.level_break:
                 self._resume_game()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
