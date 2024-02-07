@@ -1,5 +1,6 @@
 import sys
 import pygame
+import pygame_gui
 import heapq
 import json
 from time import sleep
@@ -23,6 +24,20 @@ class AlienInvasion:
         self.settings = Settings()
         self.screen = pygame.display.set_mode(size=(self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
+
+        # Create GUI Manager.
+        self.ui_manager = pygame_gui.UIManager((self.settings.screen_width, self.settings.screen_height))
+        self.clock = pygame.time.Clock()
+
+        # Input box and button are not visible until the end game
+        self.initials_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((350, 275), (100, 50)),
+                                                                  manager=self.ui_manager)
+        self.initials_input.hide()
+
+        self.submit_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 335), (100, 50)),
+                                                          text='Submit',
+                                                          manager=self.ui_manager)
+        self.submit_button.hide()
 
         # Create an instance to store game statistics.
         self.stats = GameStats(self)
@@ -316,28 +331,63 @@ class AlienInvasion:
         """Save off the player's score if they got a new top 10 score.
         """
         minHeap = []
-        score = self.stats.high_score_list
+
+        # Need to reload high scores each time a game is completed, in case a new score was saved in this session.
+        self.stats.load_high_scores()   
+        high_scores = self.stats.high_score_list
+        print(f"High Scores: {high_scores}")
 
         # Use a heap to sort the scores; O(n*logn) time
-        for player in score:
-            heapq.heappush(minHeap, (score[player], player))
+        for player in high_scores:
+            heapq.heappush(minHeap, (high_scores[player], player))
         
+        print(f"minHeap: {minHeap}")
         # If room in top 10, add current player, else we need to kick a player out.
         if len(minHeap) >= 10:
-            if minHeap[0] < self.stats.high_score:
+            if minHeap[0][0] < self.stats.score:
+                user_initials = self._get_user_initials()
                 heapq.heappop(minHeap)
-                heapq.heappush(minHeap, (self.stats.high_score, "ZZZ")) # TODO replace "ZZZ" with a reference to this player
+                heapq.heappush(minHeap, (self.stats.score, user_initials)) # TODO replace "ZZZ" with user_initials
         else:
-            heapq.heappush(minHeap, (self.stats.high_score, "ZZZ")) # TODO replace "ZZZ" with a reference to this player
+            user_initials = self._get_user_initials()
+            heapq.heappush(minHeap, (self.stats.score, user_initials)) # TODO replace "ZZZ" with user_initials
         
         # Re-save the high scores.
         high_score = {}
         while minHeap:
-            player, score = heapq.heappop(minHeap)
+            score, player = heapq.heappop(minHeap)
             high_score[player] = score
         
         with open("high_scores.json", "w") as f:
             json.dump(high_score, f)
+    
+    def _get_user_initials(self) -> str:
+        """Get the user's 3 initials to save their high score.
+
+        Returns:
+            str: The user's initials.
+        """
+        self.initials_input.show()
+        self.submit_button.show()
+
+        # Loop while we wait for the user's input.
+        while True:
+            time_delta = self.clock.tick(60)/1000.0
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return ""
+                if event.type == pygame.USEREVENT:
+                    if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                        if event.ui_element == self.submit_button:
+                            initials = self.initials_input.get_text()
+                            self.initials_input.hide()
+                            self.submit_button.hide()
+                            return initials
+                self.ui_manager.process_events(event)
+            self.ui_manager.update(time_delta)
+            self.screen.fill((0, 0, 0))
+            self.ui_manager.draw_ui(self.screen)
+            pygame.display.flip()
     
     def _check_aliens_bottom(self) -> None:
         """Check if any aliens have reached the bottom of the screen.

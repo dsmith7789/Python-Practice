@@ -14,8 +14,8 @@ class GameStats:
         self.game_paused = False
         self.level_break = False
 
-        # High score should never be reset.
-        self._load_high_scores()
+        # Handle high scores
+        self.load_high_scores()
         self.high_score = max(self.high_score_list.values()) if self.high_score_list else 0
 
     def reset_stats(self) -> None:
@@ -25,7 +25,7 @@ class GameStats:
         self.score = 0
         self.level = 1
 
-    def _load_high_scores(self) -> None:
+    def load_high_scores(self) -> None:
         """Read in the top 10 high scores from file.
         """
         try:
