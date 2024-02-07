@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 class GameStats:
     """Track statistics for Alien Invasion.
@@ -14,7 +15,8 @@ class GameStats:
         self.level_break = False
 
         # High score should never be reset.
-        self.high_score = 0
+        self._load_high_scores()
+        self.high_score = max(self.high_score_list.values()) if self.high_score_list else 0
 
     def reset_stats(self) -> None:
         """Initialize statistics that can change during the game.
@@ -22,3 +24,12 @@ class GameStats:
         self.ships_left = self.settings.ship_limit
         self.score = 0
         self.level = 1
+
+    def _load_high_scores(self) -> None:
+        """Read in the top 10 high scores from file.
+        """
+        try:
+            with open("high_scores.json") as f:
+                self.high_score_list = json.load(f)
+        except json.decoder.JSONDecodeError:
+            self.high_score_list = {}

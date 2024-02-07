@@ -1,5 +1,7 @@
 import sys
 import pygame
+import heapq
+import json
 from time import sleep
 
 from settings import Settings
@@ -301,8 +303,41 @@ class AlienInvasion:
             # Pause.
             sleep(0.5)
         else:
-            self.stats.game_active = False
-            pygame.mouse.set_visible(True)
+            self._end_game()
+
+    def _end_game(self) -> None:
+        """Handle the end game logic.
+        """
+        self.stats.game_active = False
+        self._save_high_score()
+        pygame.mouse.set_visible(True)
+
+    def _save_high_score(self) -> None:
+        """Save off the player's score if they got a new top 10 score.
+        """
+        minHeap = []
+        score = self.stats.high_score_list
+
+        # Use a heap to sort the scores; O(n*logn) time
+        for player in score:
+            heapq.heappush(minHeap, (score[player], player))
+        
+        # If room in top 10, add current player, else we need to kick a player out.
+        if len(minHeap) >= 10:
+            if minHeap[0] < self.stats.high_score:
+                heapq.heappop(minHeap)
+                heapq.heappush(minHeap, (self.stats.high_score, "ZZZ")) # TODO replace "ZZZ" with a reference to this player
+        else:
+            heapq.heappush(minHeap, (self.stats.high_score, "ZZZ")) # TODO replace "ZZZ" with a reference to this player
+        
+        # Re-save the high scores.
+        high_score = {}
+        while minHeap:
+            player, score = heapq.heappop(minHeap)
+            high_score[player] = score
+        
+        with open("high_scores.json", "w") as f:
+            json.dump(high_score, f)
     
     def _check_aliens_bottom(self) -> None:
         """Check if any aliens have reached the bottom of the screen.
