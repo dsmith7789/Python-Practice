@@ -29,16 +29,6 @@ class AlienInvasion:
         self.ui_manager = pygame_gui.UIManager((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
 
-        # Input box and button are not visible until the end game
-        self.initials_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((350, 275), (100, 50)),
-                                                                  manager=self.ui_manager)
-        self.initials_input.hide()
-
-        self.submit_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 335), (100, 50)),
-                                                          text='Submit',
-                                                          manager=self.ui_manager)
-        self.submit_button.hide()
-
         # Create an instance to store game statistics.
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
@@ -48,7 +38,44 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+        self._create_buttons()
+        
+        self._initialize_end_game_gui()
 
+        # Set the background color (light grey).
+        self.bg_color = (230, 230, 230)
+
+    def _initialize_end_game_gui(self) -> None:
+        """Handles creating all the fields that are in the high score submission form.
+        """
+        self.congrats_message = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((75, 200), (600, 100)),
+                                                            text="Congratulations! You got a top 10 score! Enter your initials below.",
+                                                            manager=self.ui_manager)
+        self.congrats_message.hide()
+        self.initials_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((350, 275), (100, 50)),
+                                                                  manager=self.ui_manager)
+        self.initials_input.hide()
+
+        self.submit_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 335), (100, 50)),
+                                                          text='Submit',
+                                                          manager=self.ui_manager)
+        self.submit_button.hide()
+        self.stats.load_high_scores()
+        score_string = ""
+        place = 1
+        for player in reversed(self.stats.high_score_list.keys()):
+            score_string += f"{place}. {player}: {self.stats.high_score_list[player]}\n"
+            print(score_string)
+            place += 1
+        
+        self.top_ten_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((725, 200), (400, 100)),
+                                                            text="Top 10 High Scores",
+                                                            manager=self.ui_manager)
+        self.top_ten_list = pygame_gui.elements.UITextBox(html_text=score_string,
+                                                          relative_rect=pygame.Rect((800, 275), (250, 325)),
+                                                          manager=self.ui_manager)
+
+    def _create_buttons(self) -> None:
         # Make the "Play" and "Pause", and "Level Cleared!" buttons
         self.play_button = Button(ai_game=self, msg="Play", width=200, height=50, 
                                   button_color=(0, 255, 0),      # bright green
@@ -66,8 +93,6 @@ class AlienInvasion:
                                   font=pygame.font.SysFont(None, 48)
                                   )
 
-        # Set the background color (light grey).
-        self.bg_color = (230, 230, 230)
     
     def run_game(self) -> None:
         """Starts the main loop for the game.
@@ -347,10 +372,10 @@ class AlienInvasion:
             if minHeap[0][0] < self.stats.score:
                 user_initials = self._get_user_initials()
                 heapq.heappop(minHeap)
-                heapq.heappush(minHeap, (self.stats.score, user_initials)) # TODO replace "ZZZ" with user_initials
+                heapq.heappush(minHeap, (self.stats.score, user_initials))
         else:
             user_initials = self._get_user_initials()
-            heapq.heappush(minHeap, (self.stats.score, user_initials)) # TODO replace "ZZZ" with user_initials
+            heapq.heappush(minHeap, (self.stats.score, user_initials))
         
         # Re-save the high scores.
         high_score = {}
@@ -369,6 +394,7 @@ class AlienInvasion:
         """
         self.initials_input.show()
         self.submit_button.show()
+        self.congrats_message.show()
 
         # Loop while we wait for the user's input.
         while True:
@@ -382,6 +408,8 @@ class AlienInvasion:
                             initials = self.initials_input.get_text()
                             self.initials_input.hide()
                             self.submit_button.hide()
+                            self.congrats_message.hide()
+                            self.initials_input.clear()
                             return initials
                 self.ui_manager.process_events(event)
             self.ui_manager.update(time_delta)
