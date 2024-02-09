@@ -4,9 +4,9 @@ import random
 
 class Deck:
     def __init__(self) -> None:
-        self.cards = self._generate_cards()
         self.definitions = Definitions()
-    
+        self.cards = self._generate_cards()
+            
     def _generate_cards(self) -> list[Card]:
         cards = []
         for suit in self.definitions.suits:
@@ -19,7 +19,7 @@ class Deck:
         """
         for i in range(len(self.cards)):
             swap_idx = random.randrange(i, len(self.cards))
-            self.cards[i], self.cards[swap_idx] = self.array[swap_idx], self.array[i]
+            self.cards[i], self.cards[swap_idx] = self.cards[swap_idx], self.cards[i]
     
     def deal(self) -> Card:
         return self.cards.pop()

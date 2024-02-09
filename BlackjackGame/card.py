@@ -12,3 +12,6 @@ class Card:
             return 11
         else:
             return int(face_value)
+    
+    def fetch_image(self) -> pygame.surface.Surface:
+        return pygame.image.load(f'images/cards/{self.face_value}_of_{self.suit}.png')

@@ -2,7 +2,7 @@ from typing import Optional
 from card import Card
 
 class Hand:
-    def __init__(self, cards: Optional[list[Card]]) -> None:
+    def __init__(self, cards: Optional[list[Card]]=[]) -> None:
         self.cards = cards
 
     def add_card(self, card: Card) -> None:
