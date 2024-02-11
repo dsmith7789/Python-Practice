@@ -56,9 +56,6 @@ class Blackjack:
         Returns:
             tuple[int, int]: Where the upper left corner of the surface should go to get the intended center.
         """
-        print(f"dest: {dest}")
-        print(f"surface.get_rect().centerx = {surface.get_rect().centerx}")
-        print(f"surface.get_rect().centery = {surface.get_rect().centery}")
         dest_x, dest_y = dest
         return (dest_x - surface.get_rect().centerx, dest_y - surface.get_rect().centery)
         
@@ -67,7 +64,7 @@ class Blackjack:
 
     def render_static_elements(self, window: pygame.surface.Surface) -> None:
         window.fill(self.definitions.window_bg_color)
-        font = pygame.font.SysFont('helvetica', 36)
+
         # The "deck" (just a single card back) shows off to the side
         window.blit(self.card_back, (100, 300))
 

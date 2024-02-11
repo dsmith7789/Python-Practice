@@ -25,3 +25,6 @@ class Definitions:
         # placements
         self.dealer_hand_label_placement = (self.window_size[0] // 2, 25)
         self.player_hand_label_placement = (self.window_size[0] // 2, self.window_size[1] - 25)
+
+        self.dealer_hand_placement = (self.window_size[0] // 2, 150)
+        self.player_hand_placement = (self.window_size[0] // 2, 650)

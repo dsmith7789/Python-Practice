@@ -1,5 +1,5 @@
 # Blackjack
-I've implemented a text-based blackjack game before, but I wanted to try a graphical based version of the game taking what I learned from the book-guided Alien Game. So, this is a more self-guided project where I had to think through the design of the game based on the rules and how I've seen the game played in real life.
+I've implemented a text-based blackjack game before [(see Black-Jack)](https://github.com/dsmith7789/Black-Jack/tree/main), but I wanted to try a graphical based version of the game taking what I learned from the book-guided Alien Game. So, this is a more self-guided project where I had to think through the design of the game based on the rules and how I've seen the game played in real life.
 
 ## Project Setup
 Like the last project, I used developed in a virtual environment to avoid package version conflicts. To do this, navigate to the directory you cloned the repo to and use the command:
