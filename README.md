@@ -7,3 +7,6 @@ This project is based on the project in chapters 12-14 of "Python Crash Course, 
 * Notifications during a break between levels (make it more obvious to players a level was advanced)
 * Persistent saving of high scores
 * A top 10 scores leaderboard. I use a heap behind the scenes to order the scores high-to-low and handle removing the bottom score, if your score beats it in the top 10.
+
+## Blackjack Game
+A graphical based version of the game Blackjack, applying some Pygame knowledge I picked up from the book-guided Alien Game project.
