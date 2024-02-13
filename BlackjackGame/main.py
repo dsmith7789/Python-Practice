@@ -1,10 +1,11 @@
 import sys
 import pygame
 from player import PlayerAction
-from engine import BlackjackEngine
+from engine import BlackjackEngine, GameState
 from definitions import Definitions
 from card import Card
 from hand import Hand
+from button import Button
 
 class Blackjack:
     def __init__(self) -> None:
@@ -16,6 +17,21 @@ class Blackjack:
 
         self.engine = BlackjackEngine()
         self.card_back = self.load_back_of_card()
+        self.create_buttons()
+
+    def create_buttons(self) -> None:
+        self.hit_button = Button(text="Click to Hit (or press H key)", width=self.definitions.button_size[0], 
+                                 height=self.definitions.button_size[1], center=self.definitions.hit_button_center,
+                                 button_color=self.definitions.hit_button_color, text_color=self.definitions.white)
+        self.stay_button = Button(text="Click to Stay (or press S key)", width=self.definitions.button_size[0], 
+                                  height=self.definitions.button_size[1], center=self.definitions.stay_button_center,
+                                  button_color=self.definitions.stay_button_color, text_color=self.definitions.white)
+        self.win_button = Button(text="You won! Click to play again (or press Enter)", width=self.definitions.end_button_size[0],
+                                 height=self.definitions.end_button_size[1], center=self.window.get_rect().center,
+                                 button_color=self.definitions.win_button_color, text_color=self.definitions.white)
+        self.lose_button = Button(text="You lost. Click to play again (or press Enter)", width=self.definitions.end_button_size[0],
+                                  height=self.definitions.end_button_size[1], center=self.window.get_rect().center,
+                                  button_color=self.definitions.lose_button_color, text_color=self.definitions.white)
     
     def load_back_of_card(self) -> pygame.surface.Surface:
         image = pygame.image.load('images/cards/card_back.png')
@@ -30,6 +46,9 @@ class Blackjack:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     action = self.key_to_action(event)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    action = self.click_to_action(mouse_pos)
             self.engine.play(action)
             self.render_game(self.window)
             pygame.display.flip()
@@ -37,10 +56,29 @@ class Blackjack:
     def key_to_action(self, event: pygame.event.Event) -> PlayerAction:
         if event.key in [pygame.K_ESCAPE, pygame.K_q]:
             sys.exit()
-        if event.key == pygame.K_h:
+        if event.key == pygame.K_h and self.engine.state == GameState.PLAYING:
             return PlayerAction.HIT
-        elif event.key == pygame.K_s:
+        elif event.key == pygame.K_s and self.engine.state == GameState.PLAYING:
             return PlayerAction.STAY
+        elif event.key in [pygame.K_KP_ENTER, pygame.K_RETURN] and self.engine.state == GameState.ENDED:
+            return PlayerAction.RESET
+        else:
+            return None
+        
+    def click_to_action(self, mouse_pos: tuple[int, int]) -> PlayerAction:
+        hb_clicked = self.hit_button.rect.collidepoint(mouse_pos)
+        sb_clicked = self.stay_button.rect.collidepoint(mouse_pos)
+        wb_clicked = self.win_button.rect.collidepoint(mouse_pos)
+        lb_clicked = self.lose_button.rect.collidepoint(mouse_pos)
+
+        if hb_clicked and self.engine.state == GameState.PLAYING:
+            return PlayerAction.HIT
+        elif sb_clicked and self.engine.state == GameState.PLAYING:
+            return PlayerAction.STAY
+        elif (wb_clicked or lb_clicked) and self.engine.state == GameState.ENDED:
+            return PlayerAction.RESET
+        else:
+            return None
         
     def center_surface_on_point(self, surface: pygame.surface.Surface, dest: tuple[int, int]) -> tuple[int, int]:
         """Calculates the correct spot to place a surface given an intended destination.
@@ -86,16 +124,23 @@ class Blackjack:
         # The "deck" (just a single card back) shows off to the side
         window.blit(self.card_back, (100, 300))
 
+        self.hit_button.draw_button(window)
+        self.stay_button.draw_button(window)
+
+    def render_dynamic_elements(self, window: pygame.surface.Surface) -> None:
         # The dealer's hand and player's hand are labeled
-        text = self.definitions.md_font.render("Dealer", True, (255,255,255))
+        dealer_text = f"Dealer: Score = {self.engine.dealer_player.get_score()}"
+        dealer_text += ("" if not self.engine.dealer_player.busted() else " [BUSTED]")
+        text = self.definitions.md_font.render(dealer_text, True, (255,255,255))
         coords = self.center_surface_on_point(text, self.definitions.dealer_hand_label_placement)
         window.blit(text, coords)
 
-        text = self.definitions.md_font.render("Player", True, (255,255,255))
+        player_text = f"Player: Score = {self.engine.human_player.get_score()}"
+        player_text += ("" if not self.engine.human_player.busted() else " [BUSTED]")
+        text = self.definitions.md_font.render(player_text, True, (255,255,255))
         coords = self.center_surface_on_point(text, self.definitions.player_hand_label_placement)
         window.blit(text, coords)
 
-    def render_dynamic_elements(self, window: pygame.surface.Surface) -> None:
         # render dealer hand
         #print(f"Dealer Hand: {self.engine.dealer_player.hand}")
         self.render_hand(window, self.engine.dealer_player.hand, self.definitions.dealer_hand_placement)
@@ -103,6 +148,12 @@ class Blackjack:
         # render player hand
         #print(f"Player Hand: {self.engine.human_player.hand}")
         self.render_hand(window, self.engine.human_player.hand, self.definitions.player_hand_placement)
+
+        if self.engine.state == GameState.ENDED:
+            if self.engine.winner():
+                self.win_button.draw_button(window)
+            else:
+                self.lose_button.draw_button(window)
 
 
     def render_hand(self, window: pygame.surface.Surface, hand: Hand, dest: tuple[int, int]) -> None:

@@ -13,18 +13,20 @@ class GameState(Enum):
 
 class BlackjackEngine:
     def __init__(self) -> None:
+        self.setup_game()
+        
+    def setup_game(self) -> None:
         self.definitions = Definitions()
         self.deck = Deck()
         self.deck.shuffle_cards()
         self.human_turn = True
         self.human_player = Player() 
         self.dealer_player = Player()
-        print(f"self.human_player is self.dealer_player?: {self.human_player is self.dealer_player}")
-        print(f"self.human_player.hand is self.dealer_player.hand?: {self.human_player.hand is self.dealer_player.hand}")
         self.state = GameState.SETUP
         self.result = None
 
     def hit(self, player: Player):
+        print("got a hit")
         card = self.deck.deal()
         player.hand.add_card(card)
 
@@ -42,6 +44,7 @@ class BlackjackEngine:
         # Dealer must hit if they have a hand with value 16 or less
         while self.dealer_player.hand.get_value() < 17:
             self.hit(self.dealer_player)
+        self.state = GameState.ENDED
     
     def initial_deal(self, player: Player) -> None:
         """Each player gets 2 cards to start.
@@ -52,7 +55,6 @@ class BlackjackEngine:
         for _ in range(2):
             card = self.deck.deal()
             player.hand.add_card(card)
-        print(player.hand)
     
     def winner(self) -> bool:
         if not self.is_hand_valid(self.human_player):
@@ -66,6 +68,9 @@ class BlackjackEngine:
             return self.human_player.hand.get_value() > self.dealer_player.hand.get_value()
     
     def play(self, action: PlayerAction):
+        if action == PlayerAction.RESET:
+            self.setup_game()
+
         if self.state == GameState.SETUP:
             self.initial_deal(self.human_player)
             self.initial_deal(self.dealer_player)
@@ -78,5 +83,7 @@ class BlackjackEngine:
                     self.stay()
             else:
                 self.dealer_process()
+            if not self.is_hand_valid(self.human_player) or not self.is_hand_valid(self.dealer_player):
+                self.state = GameState.ENDED
         elif self.state == GameState.ENDED:
             self.result = self.winner()

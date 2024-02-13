@@ -9,11 +9,19 @@ class Definitions:
         self.max_score = 21
 
         # colors
-        self.window_bg_color = (20, 75, 35)     # the color of felt at a cards table
+        self.window_bg_color = (20, 75, 35)             # the color of felt at a cards table
+        self.hit_button_color = (0, 0, 255)             # blue
+        self.stay_button_color = (200, 150, 20)         # gold-yellow (sort of a neutral color)
+        self.win_button_color = (0, 255, 20)            # green (for victory)
+        self.lose_button_color = (255, 0, 0)            # red (for loss)
+        self.black = (0, 0, 0)
+        self.white = (255, 255, 255)
 
         # sizes (width, height)
-        self.window_size = (1200, 800) 
-        self.card_size = (int(238*0.6), int(332*0.6))
+        self.window_size = (1300, 800) 
+        self.card_size = (int(238*0.6), int(332*0.6))   # (142, 199)
+        self.button_size = (325, 50)
+        self.end_button_size = (500, 50)
 
         # fonts
         self.xl_font = pygame.font.SysFont('helvetica', 60)
@@ -28,5 +36,8 @@ class Definitions:
 
         self.dealer_hand_placement = (self.window_size[0] // 2, 200)
         self.player_hand_placement = (self.window_size[0] // 2, 650)
+
+        self.hit_button_center = (self.window_size[0] - self.button_size[0] // 2 - 20, self.window_size[1] // 2 - 30)
+        self.stay_button_center = (self.window_size[0] - self.button_size[0] // 2 - 20, self.window_size[1] // 2 + 30)
 
         self.card_margin = 20

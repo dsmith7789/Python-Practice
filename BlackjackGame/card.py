@@ -15,7 +15,7 @@ class Card:
     
     def get_value(self, face_value: str) -> int:
         if face_value in ["ace", "jack", "queen", "king"]:
-            return 11
+            return 10
         else:
             return int(face_value)
     
