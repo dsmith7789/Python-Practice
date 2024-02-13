@@ -4,6 +4,7 @@ from player import PlayerAction
 from engine import BlackjackEngine
 from definitions import Definitions
 from card import Card
+from hand import Hand
 
 class Blackjack:
     def __init__(self) -> None:
@@ -58,9 +59,26 @@ class Blackjack:
         """
         dest_x, dest_y = dest
         return (dest_x - surface.get_rect().centerx, dest_y - surface.get_rect().centery)
+    
+    def get_upper_left_coords(self, center: tuple[int, int], width: int, height: int) -> tuple[int, int]:
+        """ Translates a center coordinate to its corresponding upper left coordinate.
+
+        Given the center of a rectangular object (defined by its width and height), find the coordinate of its upper left corner.
+
+        Args:
+            center (tuple[int, int]): The center of the object (X, Y)
+            width (int): How wide the object is.
+            height (int): How tall the object is.
+
+        Returns:
+            tuple[int, int]: The coordinates of the upper left corner of the object (X, Y).
+        """
+        center_x, center_y = center
+        return center_x - (width // 2), center_y - (height // 2)
         
     def render_game(self, window: pygame.surface.Surface) -> None:
-        self.render_static_elements(window)        
+        self.render_static_elements(window)  
+        self.render_dynamic_elements(window)      
 
     def render_static_elements(self, window: pygame.surface.Surface) -> None:
         window.fill(self.definitions.window_bg_color)
@@ -77,8 +95,27 @@ class Blackjack:
         coords = self.center_surface_on_point(text, self.definitions.player_hand_label_placement)
         window.blit(text, coords)
 
-    def render_player_hands(self, window: pygame.surface.Surface) -> None:
-        pass
+    def render_dynamic_elements(self, window: pygame.surface.Surface) -> None:
+        # render dealer hand
+        #print(f"Dealer Hand: {self.engine.dealer_player.hand}")
+        self.render_hand(window, self.engine.dealer_player.hand, self.definitions.dealer_hand_placement)
+
+        # render player hand
+        #print(f"Player Hand: {self.engine.human_player.hand}")
+        self.render_hand(window, self.engine.human_player.hand, self.definitions.player_hand_placement)
+
+
+    def render_hand(self, window: pygame.surface.Surface, hand: Hand, dest: tuple[int, int]) -> None:
+        card_width, card_height = self.definitions.card_size
+        hand_width = (hand.get_size() * card_width) + (hand.get_size() * self.definitions.card_margin)
+        hand_height = card_height + (2 * self.definitions.card_margin)
+        position = self.get_upper_left_coords(dest, hand_width, hand_height)
+        for i in range(hand.get_size()):
+            card = hand.get_card(i)
+            self.render_card(window, card, position)
+            x, y = position
+            x += card_width + self.definitions.card_margin
+            position = (x, y)
 
     def render_dealer_hand(self, window: pygame.surface.Surface) -> None:
         """The dealer's hand goes in the top of the screen.
@@ -86,7 +123,11 @@ class Blackjack:
         Args:
             window (pygame.surface.Surface): The current pygame window.
         """
+        pass
         
+    def render_card(self, window: pygame.surface.Surface, card: Card, dest: tuple[int, int]) -> None:
+        window.blit(card.fetch_image(), dest)
+        pass
 
 if __name__ == "__main__":
     game = Blackjack()

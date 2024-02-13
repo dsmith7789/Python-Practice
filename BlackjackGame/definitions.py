@@ -28,3 +28,5 @@ class Definitions:
 
         self.dealer_hand_placement = (self.window_size[0] // 2, 150)
         self.player_hand_placement = (self.window_size[0] // 2, 650)
+
+        self.card_margin = 20

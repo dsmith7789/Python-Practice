@@ -17,8 +17,11 @@ class BlackjackEngine:
         self.deck = Deck()
         self.deck.shuffle_cards()
         self.human_turn = True
-        self.human_player, self.dealer_player = Player(), Player()
-        self.state = GameState.PLAYING
+        self.human_player = Player() 
+        self.dealer_player = Player()
+        print(f"self.human_player is self.dealer_player?: {self.human_player is self.dealer_player}")
+        print(f"self.human_player.hand is self.dealer_player.hand?: {self.human_player.hand is self.dealer_player.hand}")
+        self.state = GameState.SETUP
         self.result = None
 
     def hit(self, player: Player):
@@ -46,9 +49,10 @@ class BlackjackEngine:
         Args:
             player (Player): The player we're currently dealing cards to.
         """
-        for i in range(2):
+        for _ in range(2):
             card = self.deck.deal()
             player.hand.add_card(card)
+        print(player.hand)
     
     def winner(self) -> bool:
         if not self.is_hand_valid(self.human_player):
@@ -63,8 +67,8 @@ class BlackjackEngine:
     
     def play(self, action: PlayerAction):
         if self.state == GameState.SETUP:
-            for player in [self.human_player, self.dealer_player]:
-                self.initial_deal(player)
+            self.initial_deal(self.human_player)
+            self.initial_deal(self.dealer_player)
             self.state = GameState.PLAYING
         elif self.state == GameState.PLAYING:
             if self.human_turn:

@@ -16,6 +16,16 @@ With the virtual environment activated, you can install all the required package
 
 Basically this iterates through the lines in the `requirements.txt` file and installs the specific version of the package on that line.
 
+## Interesting Lessons
+### Default mutable arguments in function definitions
+I was seeing an odd bug where the hands would have the same cards, even though the Hand and Player objects were definitely different. This was because of my initial constructor for the Hand class:
+
+`class Hand: def __init__(self, cards: Optional[list[Card]]=[]):`
+
+The default value of `[]` was being shared across all calls to the function. This meant that when the default value was modified (e.g. adding a card), those modifications were showing up in all the lists of cards, meaning both hands would always have the same cards.
+
+**SOLUTION:** Use the list() constructor, e.g. (`self.cards = list(cards)`) which will create a deep copy of the argument and set the self.cards array to that list copy, which will be guaranteed to be a new object in memory from the default list.
+
 ## TO-DO
 * Dynamically calculate the placement of the "Deck"
 * Get hands to display on the same center point, no matter how many cards in the hand.
@@ -28,3 +38,5 @@ Basically this iterates through the lines in the `requirements.txt` file and ins
 * Display the score of the dealer's hand after their 2nd card has been revealed.
 * Have some end-game screen (when a player busts, if the player has won/lost)
 * (Nice to have) use some "flip" animation when dealing cards from the deck
+* Add unit tests to the project
+* Add logging to the project
