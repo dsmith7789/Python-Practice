@@ -40,6 +40,9 @@ class Definitions:
         self.hit_button_center = (self.window_size[0] - self.button_size[0] // 2 - 20, self.window_size[1] // 2 - 30)
         self.stay_button_center = (self.window_size[0] - self.button_size[0] // 2 - 20, self.window_size[1] // 2 + 30)
 
+        self.dealer_wins_placement = (self.window_size[0] - self.button_size[0] // 2 - 20, 25)
+        self.player_wins_placement = (self.window_size[0] - self.button_size[0] // 2 - 20, self.window_size[1] - 25)
+
         self.card_margin = 20
 
         self.deck_placement = (100, self.window_size[1] // 2 - self.card_size[1] // 2)

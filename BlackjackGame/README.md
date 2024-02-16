@@ -43,4 +43,4 @@ The default value of `[]` was being shared across all calls to the function. Thi
 * (Nice to have) use some "flip" animation when dealing cards from the deck
 * Add some session specific score keeping (i.e. in this session, you have won X and computer won Y)
 * Add unit tests to the project
-* Add logging to the project
+* Add logging to the project - Use Observer design pattern here

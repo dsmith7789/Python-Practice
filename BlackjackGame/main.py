@@ -141,6 +141,16 @@ class Blackjack:
         coords = self.center_surface_on_point(text, self.definitions.player_hand_label_placement)
         window.blit(text, coords)
 
+        dealer_wins = f"Dealer victories: {self.engine.dealer_wins}"
+        text = self.definitions.sm_font.render(dealer_wins, True, (255,255,255))
+        coords = self.center_surface_on_point(text, self.definitions.dealer_wins_placement)
+        window.blit(text, coords)
+
+        player_wins = f"Your victories: {self.engine.player_wins}"
+        text = self.definitions.sm_font.render(player_wins, True, (255,255,255))
+        coords = self.center_surface_on_point(text, self.definitions.player_wins_placement)
+        window.blit(text, coords)
+
         # render dealer hand
         #print(f"Dealer Hand: {self.engine.dealer_player.hand}")
         dealer_hand = self.get_dealer_hand()

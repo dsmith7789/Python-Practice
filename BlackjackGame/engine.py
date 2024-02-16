@@ -13,17 +13,25 @@ class GameState(Enum):
 
 class BlackjackEngine:
     def __init__(self) -> None:
+        self.result = None
         self.setup_game()
+        self.player_wins = 0
+        self.dealer_wins = 0
         
     def setup_game(self) -> None:
         self.definitions = Definitions()
         self.deck = Deck()
         self.deck.shuffle_cards()
+        if self.result == True:
+            self.player_wins += 1
+        elif self.result == False:
+            self.dealer_wins += 1
         self.human_turn = True
         self.human_player = Player() 
         self.dealer_player = Player()
         self.state = GameState.SETUP
         self.result = None
+        
 
     def hit(self, player: Player):
         print("got a hit")
