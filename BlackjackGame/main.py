@@ -122,14 +122,14 @@ class Blackjack:
         window.fill(self.definitions.window_bg_color)
 
         # The "deck" (just a single card back) shows off to the side
-        window.blit(self.card_back, (100, 300))
+        window.blit(self.card_back, self.definitions.deck_placement)
 
         self.hit_button.draw_button(window)
         self.stay_button.draw_button(window)
 
     def render_dynamic_elements(self, window: pygame.surface.Surface) -> None:
         # The dealer's hand and player's hand are labeled
-        dealer_text = f"Dealer: Score = {self.engine.dealer_player.get_score()}"
+        dealer_text = f"Dealer: Score = {self.engine.dealer_player.get_score()}" if not self.engine.human_turn else f"Dealer: Score = ???"
         dealer_text += ("" if not self.engine.dealer_player.busted() else " [BUSTED]")
         text = self.definitions.md_font.render(dealer_text, True, (255,255,255))
         coords = self.center_surface_on_point(text, self.definitions.dealer_hand_label_placement)
@@ -143,7 +143,8 @@ class Blackjack:
 
         # render dealer hand
         #print(f"Dealer Hand: {self.engine.dealer_player.hand}")
-        self.render_hand(window, self.engine.dealer_player.hand, self.definitions.dealer_hand_placement)
+        dealer_hand = self.get_dealer_hand()
+        self.render_hand(window, dealer_hand, self.definitions.dealer_hand_placement)
 
         # render player hand
         #print(f"Player Hand: {self.engine.human_player.hand}")
@@ -168,17 +169,25 @@ class Blackjack:
             x += card_width + self.definitions.card_margin
             position = (x, y)
 
-    def render_dealer_hand(self, window: pygame.surface.Surface) -> None:
+    def get_dealer_hand(self) -> Hand:
         """The dealer's hand goes in the top of the screen.
 
         Args:
             window (pygame.surface.Surface): The current pygame window.
         """
-        pass
+        if self.engine.human_turn:
+            hidden_hand = Hand()
+            dummy_card = Card("", "", True)
+            hidden_hand.add_card(dummy_card)
+            dealer_cards = self.engine.dealer_player.hand.cards
+            for i in range(1, len(dealer_cards)):
+                hidden_hand.add_card(dealer_cards[i])
+            return hidden_hand
+        else:
+            return self.engine.dealer_player.hand
         
     def render_card(self, window: pygame.surface.Surface, card: Card, dest: tuple[int, int]) -> None:
         window.blit(card.fetch_image(), dest)
-        pass
 
 if __name__ == "__main__":
     game = Blackjack()

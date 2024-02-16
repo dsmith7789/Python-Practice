@@ -24,8 +24,19 @@ class Hand:
 
     def get_value(self) -> int:
         value = 0
+        aces = 0
         for card in self.cards:
-            value += card.value
+            if card.face_value != "ace":
+                value += card.value
+            else:
+                aces += 1
+        while aces:
+            if value <= 10:
+                value += 11
+                aces -= 1
+            else:
+                value += 1
+                aces -= 1
         return value
 
     def get_size(self) -> int:

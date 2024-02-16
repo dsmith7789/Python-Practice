@@ -27,17 +27,19 @@ The default value of `[]` was being shared across all calls to the function. Thi
 **SOLUTION:** Use the list() constructor, e.g. (`self.cards = list(cards)`) which will create a deep copy of the argument and set the self.cards array to that list copy, which will be guaranteed to be a new object in memory from the default list.
 
 ## TO-DO
-* Dynamically calculate the placement of the "Deck"
+* :white_check_mark: Dynamically calculate the placement of the "Deck"
 * :white_check_mark: Don't allow unlimited hits
 * :white_check_mark: Get hands to display on the same center point, no matter how many cards in the hand.
 * :white_check_mark: Successfully display the dealer's and player's hand to the screen.
-* Display the dealer's hand initially as one face-up, one hidden card
+* :white_check_mark: Display the dealer's hand initially as one face-up, one hidden card
 * :white_check_mark: While it is the player's turn, display a pop-up with 2 buttons, allowing them to hit/stay
-* Re-display the pop-up after each turn
-* Flip the dealer's 2nd card to be visible after the player has "stayed"
+* :white_check_mark: Re-display the pop-up after each turn
+* :white_check_mark: Flip the dealer's 2nd card to be visible after the player has "stayed"
 * :white_check_mark: Display the score of the player's hand at all times
-* Display the score of the dealer's hand after their 2nd card has been revealed.
+* :white_check_mark: Display the score of the dealer's hand after their 2nd card has been revealed.
 * :white_check_mark: Have some end-game screen (when a player busts, if the player has won/lost)
+* :white_check_mark: Calculate the score of a hand with aces correctly
+* Add some slow down to simulate the cards coming into the hand?
 * (Nice to have) use some "flip" animation when dealing cards from the deck
 * Add some session specific score keeping (i.e. in this session, you have won X and computer won Y)
 * Add unit tests to the project
