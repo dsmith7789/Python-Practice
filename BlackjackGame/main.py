@@ -1,15 +1,23 @@
 import sys
 import pygame
+import logging
+import queue
+import threading
+import time
 from player import PlayerAction
 from engine import BlackjackEngine, GameState
 from definitions import Definitions
 from card import Card
 from hand import Hand
 from button import Button
+from loggerThread import LoggerThread
+from queueHandler import QueueHandler
 
 class Blackjack:
     def __init__(self) -> None:
         pygame.init()
+        self.logger = logging.getLogger('asyncLogger')
+        self.logger.debug("Start game")
         self.definitions = Definitions()
         self.size = self.definitions.window_size
         self.window = pygame.display.set_mode(self.size)
@@ -45,8 +53,10 @@ class Blackjack:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
+                    self.logger.debug("Key pressed")
                     action = self.key_to_action(event)
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.logger.debug("Mouse clicked")
                     mouse_pos = pygame.mouse.get_pos()
                     action = self.click_to_action(mouse_pos)
             self.engine.play(action)
@@ -199,6 +209,23 @@ class Blackjack:
     def render_card(self, window: pygame.surface.Surface, card: Card, dest: tuple[int, int]) -> None:
         window.blit(card.fetch_image(), dest)
 
+def setup_logging() -> logging.Logger:
+    logger = logging.getLogger('asyncLogger')
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    return logger, formatter
+
 if __name__ == "__main__":
+    log_queue = queue.Queue()
+    logger, formatter = setup_logging()
+
+    # Setup and start the logger thread
+    logger_thread = LoggerThread(log_queue, formatter)
+    logger_thread.start()
+
+    # Replace the logger's default handler with the queue-based handler
+    queue_handler = QueueHandler(log_queue)
+    logger.addHandler(queue_handler)
+
     game = Blackjack()
     game.run_game() 
