@@ -2,7 +2,6 @@ import sys
 import pygame
 import logging
 import queue
-import threading
 import time
 from player import PlayerAction
 from engine import BlackjackEngine, GameState
@@ -16,8 +15,9 @@ from queueHandler import QueueHandler
 class Blackjack:
     def __init__(self) -> None:
         pygame.init()
+        self.session_id = int(time.time())
         self.logger = logging.getLogger('asyncLogger')
-        self.logger.debug("Start game")
+        self.logger.debug(f"Start game: Session = {self.session_id}")
         self.definitions = Definitions()
         self.size = self.definitions.window_size
         self.window = pygame.display.set_mode(self.size)

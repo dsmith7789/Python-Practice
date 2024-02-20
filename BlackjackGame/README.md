@@ -44,3 +44,7 @@ The default value of `[]` was being shared across all calls to the function. Thi
 * Add some session specific score keeping (i.e. in this session, you have won X and computer won Y)
 * Add unit tests to the project
 * Add logging to the project - Use Observer design pattern here
+* Log: Clicks: Count per session and position
+* Log: Key Presses: Count per session and which key
+* Log: Wins and Losses per session
+* Log: Length of time per session
