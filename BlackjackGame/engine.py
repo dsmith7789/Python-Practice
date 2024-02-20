@@ -34,7 +34,6 @@ class BlackjackEngine:
         
 
     def hit(self, player: Player):
-        print("got a hit")
         card = self.deck.deal()
         player.hand.add_card(card)
 

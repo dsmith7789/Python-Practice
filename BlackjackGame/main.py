@@ -16,8 +16,9 @@ class Blackjack:
     def __init__(self) -> None:
         pygame.init()
         self.session_id = int(time.time())
+        self.start = time.time()
         self.logger = logging.getLogger('asyncLogger')
-        self.logger.debug(f"Start game: Session = {self.session_id}")
+        self.logger.debug(f"Session: {self.session_id}; Event: Game Start")
         self.definitions = Definitions()
         self.size = self.definitions.window_size
         self.window = pygame.display.set_mode(self.size)
@@ -51,13 +52,14 @@ class Blackjack:
             action = None
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.logger.info(f"Session: {self.session_id}; Event: Game End; Method: Click Exit")
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    self.logger.debug("Key pressed")
+                    self.logger.info(f"Session: {self.session_id}; Event: Key Press; Key: {pygame.key.name(event.key)}")
                     action = self.key_to_action(event)
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.logger.debug("Mouse clicked")
                     mouse_pos = pygame.mouse.get_pos()
+                    self.logger.info(f"Session: {self.session_id}; Event: Click; Click Position: {mouse_pos}")
                     action = self.click_to_action(mouse_pos)
             self.engine.play(action)
             self.render_game(self.window)
@@ -65,12 +67,21 @@ class Blackjack:
 
     def key_to_action(self, event: pygame.event.Event) -> PlayerAction:
         if event.key in [pygame.K_ESCAPE, pygame.K_q]:
+            self.logger.info(f"Session: {self.session_id}; Event: Game End; Method: Key Press {pygame.key.name(event.key)}")
             sys.exit()
         if event.key == pygame.K_h and self.engine.state == GameState.PLAYING:
+            self.logger.info(f"Session: {self.session_id}; Event: Player Hit (Key Press); Hand Value: {self.engine.human_player.get_score()}")
             return PlayerAction.HIT
         elif event.key == pygame.K_s and self.engine.state == GameState.PLAYING:
+            self.logger.info(f"Session: {self.session_id}; Event: Player Stay (Key Press); Hand Value: {self.engine.human_player.get_score()}")
             return PlayerAction.STAY
         elif event.key in [pygame.K_KP_ENTER, pygame.K_RETURN] and self.engine.state == GameState.ENDED:
+            if self.engine.winner():
+                self.logger.info(f"Session: {self.session_id}; Event: Player Victory; Player Score: {self.engine.human_player.get_score()}")
+            else:
+                self.logger.info(f"Session: {self.session_id}; Event: Player Defeat; Player Score: {self.engine.human_player.get_score()}")
+            self.logger.info(f"Session: {self.session_id}; Event: Reset Game (Key Press): Duration: {time.time() - self.start}")
+            self.start = time.time()
             return PlayerAction.RESET
         else:
             return None
@@ -82,10 +93,18 @@ class Blackjack:
         lb_clicked = self.lose_button.rect.collidepoint(mouse_pos)
 
         if hb_clicked and self.engine.state == GameState.PLAYING:
+            self.logger.info(f"Session: {self.session_id}; Event: Player Hit (Button Click); Hand Value: {self.engine.human_player.get_score()}")
             return PlayerAction.HIT
         elif sb_clicked and self.engine.state == GameState.PLAYING:
+            self.logger.info(f"Session: {self.session_id}; Event: Player Stay (Button Click); Hand Value: {self.engine.human_player.get_score()}")
             return PlayerAction.STAY
         elif (wb_clicked or lb_clicked) and self.engine.state == GameState.ENDED:
+            if self.engine.winner():
+                self.logger.info(f"Session: {self.session_id}; Event: Player Victory; Player Score: {self.engine.human_player.get_score()}")
+            else:
+                self.logger.info(f"Session: {self.session_id}; Event: Player Defeat; Player Score: {self.engine.human_player.get_score()}")
+            self.logger.info(f"Session: {self.session_id}; Event: Reset Game (Button Click); Duration: {time.time() - self.start}")
+            self.start = time.time()
             return PlayerAction.RESET
         else:
             return None
