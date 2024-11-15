@@ -1,0 +1,15 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore virtual environment directory
+venv/
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore file transfer remnants from Windows to WSL
+*Zone.Identifier
